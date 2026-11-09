@@ -88,7 +88,29 @@ path = unimodpy.download(force=True)           # always re-download
 # Write every entry to TSV (or CSV)
 db.write_tsv("unimod.tsv")
 db.write_tsv("unimod.csv", delimiter=",")
+```
 
+| Column | Description |
+|--------|-------------|
+| `id` | `UNIMOD:N` accession. |
+| `name` | Modification name. |
+| `definition` | Full prose definition. |
+| `synonyms` | Alternative names, joined by `"; "`. |
+| `comment` | Curator comments. |
+| `record_id` | Internal record integer. |
+| `delta_mono_mass` | Monoisotopic mass shift. |
+| `delta_avge_mass` | Average mass shift. |
+| `delta_composition` | Elemental composition change. |
+| `username_of_poster` | Name of the original poster. |
+| `group_of_poster` | Group of the original poster. |
+| `date_time_posted` | Creation timestamp (`YYYY-MM-DD HH:MM:SS`). |
+| `date_time_modified` | Last update timestamp (`YYYY-MM-DD HH:MM:SS`). |
+| `approved` | Approval flag (`1` for true, `0` for false, or empty). |
+| `is_a` | Accession of the parent term (`UNIMOD:N`). |
+| `specificities` | Rules as `site:position:classification`, joined by `"; "`. |
+| `specificities_hidden` | Flag per specificity (`1` if hidden, `0` if visible), joined by `"; "` in the same order as `specificities`. |
+
+```python
 # Round-trip back to UNIMOD OBO format
 db.write_obo("out/UNIMOD.obo")
 db2 = unimodpy.parse_obo("out/UNIMOD.obo")  # identical entry count and fields
