@@ -1,6 +1,8 @@
 """Tests for the TSV/CSV tabular writer."""
 
 import csv
+import re
+from pathlib import Path
 
 from unimodpy import UnimodDatabase, write_tsv
 from unimodpy._tabular import _COLUMNS
@@ -163,3 +165,24 @@ def test_hidden_flags_align_with_the_specificities_cell(db: UnimodDatabase, tmp_
         assert len(flags) == len(specs)
         exported_hidden += flags.count("1")
     assert exported_hidden == sum(1 for entry in db for spec in entry.specificities if spec.hidden)
+
+
+def test_columns_documentation_drift() -> None:
+    """Verify that the TSV column table in README.md matches the actual _COLUMNS."""
+    readme_path = Path(__file__).parent.parent / "README.md"
+    content = readme_path.read_text(encoding="utf-8")
+
+    # Extract all tables starting with | Column | Description |
+    tables = re.findall(r"(\| Column \| Description \|.*?\n(?:\|.*?\n)+)", content)
+    # Identify the TSV export table by its unique columns
+    target_table = next((t for t in tables if "`username_of_poster`" in t), None)
+
+    assert target_table is not None, "TSV column table not found in README.md"
+
+    # Extract the names in backticks from the first column of the table
+    readme_cols = re.findall(r"\| `([^`]+)` \|", target_table)
+
+    assert tuple(readme_cols) == _COLUMNS, (
+        f"README columns {readme_cols} do not match _COLUMNS {_COLUMNS}. "
+        "Please update the table in README.md."
+    )
